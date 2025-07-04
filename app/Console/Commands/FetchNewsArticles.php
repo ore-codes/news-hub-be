@@ -47,6 +47,9 @@ class FetchNewsArticles extends Command
             $articles = $source === 'eventregistry' ? $service->fetchArticles(10) : $service->fetchArticles();
             $newCount = 0;
             foreach ($articles as $articleData) {
+                if (isset($articleData['content']) && $articleData['content'] !== null) {
+                    $articleData['content'] = mb_substr($articleData['content'], 0, 1000);
+                }
                 $exists = Article::where('source', $articleData['source'])
                     ->where('source_id', $articleData['source_id'])
                     ->exists();

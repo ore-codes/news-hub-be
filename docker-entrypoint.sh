@@ -7,4 +7,6 @@ php artisan migrate --force || true
 
 php artisan app:fetch-news-articles
 
+php artisan l5-swagger:generate
+
 exec "$@" 

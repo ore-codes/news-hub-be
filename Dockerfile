@@ -3,18 +3,18 @@ FROM php:8.3-fpm-alpine
 WORKDIR /var/www/html
 
 RUN apk add --no-cache \
-    git \
+  git \
     curl \
     nginx \
     build-base \
-    libpng-dev \
+  libpng-dev \
     jpeg-dev \
     libwebp-dev \
     freetype-dev \
     libzip-dev \
     icu-dev \
     postgresql-dev \
-    libxml2-dev \
+  libxml2-dev \
     oniguruma-dev \
     supervisor \
     && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
@@ -45,5 +45,5 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 EXPOSE 9000
 
-CMD ["php-fpm"]
+CMD ["php-fpm"] 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]

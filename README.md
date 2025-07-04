@@ -1,71 +1,84 @@
-# News Hub
+# News Hub Backend
 
-## Running with Docker
+This is a Laravel backend for the News Hub project. It is fully containerized using Docker Compose for easy local development and deployment.
 
-This project is fully dockerized for easy setup and portability. You only need Docker and Docker Compose installed on your machine.
+## Prerequisites
 
-### 1. Clone the repository
-```sh
-git clone https://github.com/ore-codes/news-hub-be.git
-cd news-hub-be
-```
+- [Docker](https://www.docker.com/get-started) and [Docker Compose](https://docs.docker.com/compose/) installed
+- [Git](https://git-scm.com/) for cloning the repository
 
-### 2. Prepare your environment
-- Copy your environment file:
+## Quick Start
+
+1. **Clone the repository:**
+   ```sh
+   git clone https://github.com/ore-codes/news-hub-be.git
+   cd news-hub-be
+   ```
+
+2. **Copy the example environment file and edit as needed:**
+   ```sh
+   cp .env.example .env
+   # Edit .env to set your database, Meilisearch, and API keys
+   ```
+
+3. **Build and start all services:**
+   ```sh
+   docker-compose up --build -d
+   ```
+   This will build the PHP, Nginx, MySQL, and Meilisearch containers and start them in the background.
+
+4. **(First time only) Generate the application key:**
+   ```sh
+   docker-compose exec app php artisan key:generate
+   ```
+
+5. **Access the application:**
+   - API: [http://localhost:8000](http://localhost:8000)
+   - Meilisearch: [http://localhost:7700](http://localhost:7700)
+
+6. **API Documentation:**
+   - Swagger docs are generated at `/api/documentation`
+
+## Notes
+- The Laravel scheduler runs in a dedicated container (`scheduler`) and will execute scheduled tasks as defined in `routes/console.php`.
+- Database data is persisted in a Docker volume (`dbdata`).
+- Meilisearch data is persisted in a Docker volume (`meilisearch_data`).
+- If you change your `.env` file, restart the containers:
   ```sh
-  cp .env.example .env
-  ```
-- Edit `.env` and set the following for SQLite:
-  ```env
-  DB_CONNECTION=sqlite
-  DB_DATABASE=/var/www/database/database.sqlite
-  
-  NEWSAPI_KEY=<api key from newsapi.ord>
-  GUARDIAN_KEY=<api key from guardian>
-  NYTIMES_KEY=<api key from new york times>
-  EVENTREGISTRY_KEY=<api key from event registry (newsapi.ai)>
-
-  JWT_SECRET=<generate with php artisan jwt:secret>
-    
-  SCOUT_DRIVER=meilisearch
-  MEILISEARCH_HOST=http://meilisearch:7700
-  MEILISEARCH_KEY=<generate master key>
-  ```
-- Ensure the file `database/database.sqlite` exists. If not, create it:
-  ```sh
-  touch database/database.sqlite
+  docker-compose restart
   ```
 
-### 3. Build and start the containers
-```sh
-docker-compose up --build
-```
-- The Laravel app will be available at [http://localhost:8000](http://localhost:8000)
-- Meilisearch will be available at [http://localhost:7700](http://localhost:7700)
+## API Keys Setup
 
-### 4. Install dependencies and migrate the database
-Open a new terminal and run:
-```sh
-docker-compose exec app composer install
-```
-```sh
-docker-compose exec app php artisan migrate
-```
+This project requires API keys for four news platforms. You must obtain these keys and add them to your `.env` file:
 
-### 5. Stopping the application
-```sh
-docker-compose down
-```
+- `NEWSAPI_KEY`
+- `GUARDIAN_KEY`
+- `NYTIMES_KEY`
+- `EVENTREGISTRY_KEY`
 
----
+### How to Obtain API Keys
 
-## Troubleshooting
-- If you change dependencies, rebuild with `docker-compose build`.
-- If you encounter permission issues, ensure the `storage/` and `bootstrap/cache/` directories are writable by the container.
-- For Laravel logs, check `storage/logs/`.
+**1. NewsAPI**
+- Go to [https://newsapi.org/register](https://newsapi.org/register)
+- Sign up for a free account
+- After verifying your email, you will find your API key in the dashboard
+- Add it to your `.env` as `NEWSAPI_KEY=your_key_here`
 
----
+**2. The Guardian**
+- Go to [https://open-platform.theguardian.com/access/](https://open-platform.theguardian.com/access/)
+- Register for an API key
+- After approval, you will receive your key by email or in your account dashboard
+- Add it to your `.env` as `GUARDIAN_KEY=your_key_here`
 
-## Additional Notes
-- The `database/database.sqlite` file is git-ignored. Each developer should create their own local copy.
-- For production, consider using a web server like Nginx and configuring SSL.
+**3. NYTimes**
+- Go to [https://developer.nytimes.com/accounts/create](https://developer.nytimes.com/accounts/create)
+- Create an account and log in
+- Go to "Apps" and create a new app to get your API key
+- Add it to your `.env` as `NYTIMES_KEY=your_key_here`
+
+**4. EventRegistry(NewsAPI.AI)**
+- Go to [https://www.newsapi.ai/register](https://www.newsapi.ai/register)
+- Register for a free account
+- After logging in, go to your profile to find your API key
+- Add it to your `.env` as `EVENTREGISTRY_KEY=your_key_here`
