@@ -1,0 +1,10 @@
+/vendor
+/node_modules
+/storage/logs
+/storage/framework
+/storage/app
+/.git
+/.idea
+/.vscode
+/.DS_Store
+*.log

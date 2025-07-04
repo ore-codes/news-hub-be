@@ -1,31 +1,49 @@
-FROM composer:2.7 AS vendor
+FROM php:8.3-fpm-alpine
 
-WORKDIR /app
-COPY composer.json composer.lock ./
-RUN composer install --ignore-platform-reqs --no-scripts --no-autoloader
+WORKDIR /var/www/html
 
-FROM php:8.2-fpm
+RUN apk add --no-cache \
+    git \
+    curl \
+    nginx \
+    build-base \
+    libpng-dev \
+    jpeg-dev \
+    libwebp-dev \
+    freetype-dev \
+    libzip-dev \
+    icu-dev \
+    postgresql-dev \
+    libxml2-dev \
+    oniguruma-dev \
+    supervisor \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
+    && docker-php-ext-install -j$(nproc) \
+        pdo_mysql \
+        gd \
+        bcmath \
+        exif \
+        mbstring \
+        opcache \
+        zip \
+        intl \
+        pcntl \
+        xml \
+        pdo_pgsql \
+    && docker-php-ext-enable opcache \
+    && rm -rf /tmp/* /var/cache/apk/*
 
-RUN apt-get update && apt-get install -y \
-  git \
-  unzip \
-  libpng-dev \
-  libonig-dev \
-  libxml2-dev \
-  zip \
-  curl
-
-RUN docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd
-
-COPY --from=vendor /usr/bin/composer /usr/bin/composer
-
-WORKDIR /var/www
+COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
 COPY . .
 
-COPY --from=vendor /app/vendor /var/www/vendor
+RUN chown -R www-data:www-data storage bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache
 
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 EXPOSE 9000
-CMD ["php-fpm"] 
+
+CMD ["php-fpm"]
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]

@@ -1,30 +1,83 @@
 version: '3.8'
+
 services:
+  # PHP-FPM Service
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    image: laravel-app
-    container_name: laravel-app
+    container_name: laravel_app
     restart: unless-stopped
     volumes:
-      - ./:/var/www
-    depends_on:
-      - meilisearch
-    ports:
-      - "8000:8000"
-    command: php artisan serve --host=0.0.0.0 --port=8000
+      - .:/var/www/html
+    networks:
+      - laravel_network
 
-  meilisearch:
-    image: getmeili/meilisearch:latest
-    container_name: meilisearch
+  # Nginx Service
+  nginx:
+    image: nginx:alpine
+    container_name: laravel_nginx
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - .:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - laravel_network
+
+  # MySQL Service
+  db:
+    image: mysql:8.0
+    container_name: laravel_db
+    restart: unless-stopped
     environment:
-      - MEILI_NO_ANALYTICS=true
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - laravel_network
+
+  # MeiliSearch Service
+  meilisearch:
+    image: getmeili/meilisearch:v1.8
+    container_name: laravel_meilisearch
+    restart: unless-stopped
     ports:
       - "7700:7700"
     volumes:
-      - ./meili_data:/meili_data
-    command: ["meilisearch", "--db-path", "/meili_data"]
+      - meilisearch_data:/meili_data
+    environment:
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
+    networks:
+      - laravel_network
+
+  # Scheduler Service
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: laravel_scheduler
+    restart: unless-stopped
+    volumes:
+      - .:/var/www/html
+    entrypoint: ["php", "artisan", "schedule:work"]
+    depends_on:
+      - app
+    networks:
+      - laravel_network
+
+networks:
+  laravel_network:
+    driver: bridge
 
 volumes:
-  db_data: 
+  dbdata: # Volume for MySQL data
+  meilisearch_data: # Volume for MeiliSearch data
