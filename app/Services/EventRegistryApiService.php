@@ -5,17 +5,8 @@ namespace App\Services;
 use GuzzleHttp\Client;
 use Illuminate\Support\Arr;
 
-class EventRegistryApiService
+class EventRegistryApiService extends AbstractApiService
 {
-    protected $apiKey;
-    protected $client;
-
-    public function __construct($apiKey)
-    {
-        $this->apiKey = $apiKey;
-        $this->client = new Client();
-    }
-
     public function fetchArticles($articlesCount = 10, $dateStart = null)
     {
         $url = 'https://eventregistry.org/api/v1/article/getArticles';

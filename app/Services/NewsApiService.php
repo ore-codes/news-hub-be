@@ -5,17 +5,8 @@ namespace App\Services;
 use GuzzleHttp\Client;
 use Illuminate\Support\Arr;
 
-class NewsApiService
+class NewsApiService extends AbstractApiService
 {
-    protected $apiKey;
-    protected $client;
-
-    public function __construct($apiKey)
-    {
-        $this->apiKey = $apiKey;
-        $this->client = new Client();
-    }
-
     public function fetchArticles()
     {
         $url = 'https://newsapi.org/v2/top-headlines?language=en&pageSize=100&apiKey=' . $this->apiKey;

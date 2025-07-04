@@ -4,17 +4,8 @@ namespace App\Services;
 use GuzzleHttp\Client;
 use Illuminate\Support\Arr;
 
-class GuardianApiService
+class GuardianApiService extends AbstractApiService
 {
-    protected $apiKey;
-    protected $client;
-
-    public function __construct($apiKey)
-    {
-        $this->apiKey = $apiKey;
-        $this->client = new Client();
-    }
-
     public function fetchArticles()
     {
         // Fetch total pages first

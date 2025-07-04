@@ -5,17 +5,8 @@ namespace App\Services;
 use GuzzleHttp\Client;
 use Illuminate\Support\Arr;
 
-class NytimesApiService
+class NytimesApiService extends AbstractApiService
 {
-    protected $apiKey;
-    protected $client;
-
-    public function __construct($apiKey)
-    {
-        $this->apiKey = $apiKey;
-        $this->client = new Client();
-    }
-
     public function fetchArticles()
     {
         $url = 'https://api.nytimes.com/svc/topstories/v2/home.json?api-key=' . $this->apiKey;
