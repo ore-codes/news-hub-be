@@ -57,6 +57,14 @@ This project requires API keys for four news platforms. You must obtain these ke
 - `NYTIMES_KEY`
 - `EVENTREGISTRY_KEY`
 
+Or use mine for testing (it is icnluded in `.env.example`)
+```
+NEWSAPI_KEY=879dadcd93fc46aa80d3170fbe4c68ab
+GUARDIAN_KEY=29a3b530-5a47-4795-9bbc-28099ab922c5
+NYTIMES_KEY=1mvFxDm1RS09VlKo2rnxukHw8lupK7hK
+EVENTREGISTRY_KEY=805a1134-ee5f-47e4-bc9c-f98dd9f96df4
+```
+
 ### How to Obtain API Keys
 
 **1. NewsAPI**

@@ -4,9 +4,8 @@ if [ ! -f vendor/autoload.php ]; then
 fi
 
 php artisan migrate --force || true
-
 php artisan app:fetch-news-articles
-
 php artisan l5-swagger:generate
+php artisan jwt:secret
 
 exec "$@" 
